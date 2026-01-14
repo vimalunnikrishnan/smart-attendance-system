@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Report</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f8;
+            padding: 20px;
+        }
+        table {
+            width: 85%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 6px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #343a40;
+            color: white;
+        }
+        .back {
+            display: block;
+            width: 150px;
+            margin: 15px auto;
+            padding: 6px;
+            text-align: center;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align:center;">Attendance Report</h2>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Roll No</th>
+        <th>Total Classes</th>
+        <th>Present</th>
+        <th>Percentage</th>
+    </tr>
+
+    {% for r in report %}
+    <tr>
+        <td>{{ r[0] }}</td>
+        <td>{{ r[1] }}</td>
+        <td>{{ r[2] }}</td>
+        <td>{{ r[3] or 0 }}</td>
+        <td>{{ r[4] or 0 }}</td>
+        <td>
+            {% if r[3] %}
+                {{ ((r[4] / r[3]) * 100) | round(2) }} %
+            {% else %}
+                0 %
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="/admin" class="back">⬅ Back</a>
+
+</body>
+</html>

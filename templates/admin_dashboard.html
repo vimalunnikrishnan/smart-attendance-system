@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 40px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .card {
+            background: white;
+            width: 300px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        a {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        a.logout {
+            background: #dc3545;
+        }
+        a:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Admin Dashboard</h1>
+
+<div class="card">
+    <a href="/add_student">➕ Add Student</a>
+    <a href="/students">👨‍🎓 View Students</a>
+    <a href="/mark_attendance">📝 Mark Attendance</a>
+    <a href="/attendance_report">📊 Attendance Report</a>
+    <a href="/logout" class="logout">🚪 Logout</a>
+</div>
+
+</body>
+</html>

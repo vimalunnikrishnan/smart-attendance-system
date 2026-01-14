@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Student</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef2f3;
+            padding: 40px;
+        }
+        form {
+            background: white;
+            width: 300px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+        button {
+            background: green;
+            color: white;
+            border: none;
+        }
+        a {
+            display: block;
+            width: 120px;
+            margin: 20px auto;
+            padding: 8px;
+            text-align: center;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<form method="POST">
+    <h3>Add Student</h3>
+    <input type="text" name="name" placeholder="Student Name" required>
+    <input type="text" name="roll_no" placeholder="Roll Number" required>
+    <input type="text" name="department" placeholder="Department" required>
+    <button type="submit">Add Student</button>
+</form>
+
+</body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Students</title>
+</head>
+<body>
+<h2>Student List</h2>
+
+<table border="1">
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Roll No</th>
+    <th>Department</th>
+</tr>
+
+{% for s in students %}
+<tr>
+    <td>{{ s[0] }}</td>
+    <td>{{ s[1] }}</td>
+    <td>{{ s[2] }}</td>
+    <td>{{ s[3] }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+<a href="/admin">⬅ Back</a>
+</body>
+</html>

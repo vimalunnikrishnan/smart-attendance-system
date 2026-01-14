@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mark Attendance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 30px;
+        }
+
+        .container {
+            background: white;
+            width: 420px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        select {
+            padding: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 8px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .back {
+            display: block;
+            margin-top: 12px;
+            text-align: center;
+            text-decoration: none;
+            background: #28a745;
+            color: white;
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 6px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Mark Attendance</h2>
+
+    <div class="date">
+        Date: <script>document.write(new Date().toLocaleDateString());</script>
+    </div>
+
+    {% if request.method == 'POST' %}
+        <div class="success">✅ Attendance submitted successfully</div>
+    {% endif %}
+
+    <form method="POST">
+        {% for s in students %}
+            <div class="row">
+                <span>{{ s[1] }} ({{ s[2] }})</span>
+                <select name="{{ s[0] }}"
+                        onchange="this.style.backgroundColor =
+                        this.value=='Present' ? '#d4edda' : '#f8d7da'">
+                    <option value="Present">Present</option>
+                    <option value="Absent">Absent</option>
+                </select>
+            </div>
+        {% endfor %}
+
+        <button type="submit">Submit Attendance</button>
+    </form>
+
+    <a href="/admin" class="back">⬅ Back to Dashboard</a>
+</div>
+
+</body>
+</html>
