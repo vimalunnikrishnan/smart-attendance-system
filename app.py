@@ -1,51 +1,91 @@
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, redirect, session
+import os
 import sqlite3
 from datetime import date
 
+from flask import Flask, render_template, request, redirect, session
+from werkzeug.security import generate_password_hash, check_password_hash
+
+# =====================================================
+# APP CONFIG
+# =====================================================
 app = Flask(__name__)
 app.secret_key = "smart_attendance_key"
 
-# ---------- DATABASE CONNECTION ----------
-def get_db():
-    return sqlite3.connect("database.db")
+# =====================================================
+# DATABASE CONFIG (WORKS ON LOCAL + RENDER)
+# =====================================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "database.db")
 
-# ---------- CREATE TABLES ----------
+
+# =====================================================
+# DATABASE CONNECTION
+# =====================================================
+def get_db():
+    return sqlite3.connect(DB_PATH)
+
+
+# =====================================================
+# DATABASE INITIALIZATION
+# =====================================================
 def init_db():
-    con = sqlite3.connect("database.db")
+    con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
 
+    # USERS TABLE
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS users(
+    CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        password TEXT,
-        role TEXT
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL
     )
     """)
 
+    # STUDENTS TABLE
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS students(
+    CREATE TABLE IF NOT EXISTS students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        roll_no TEXT,
-        department TEXT
+        name TEXT NOT NULL,
+        roll_no TEXT UNIQUE NOT NULL,
+        department TEXT NOT NULL
     )
     """)
 
+    # ATTENDANCE TABLE
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS attendance(
+    CREATE TABLE IF NOT EXISTS attendance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_id INTEGER,
-        date TEXT,
-        status TEXT
+        student_id INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        status TEXT NOT NULL,
+        FOREIGN KEY (student_id) REFERENCES students(id)
     )
     """)
+
+    # CREATE DEFAULT ADMIN
+    cur.execute("SELECT * FROM users WHERE username='admin'")
+    admin = cur.fetchone()
+
+    if not admin:
+        cur.execute(
+            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+            ("admin", generate_password_hash("admin123"), "admin")
+        )
 
     con.commit()
     con.close()
 
-# ---------- LOGIN ----------
+
+# =====================================================
+# RUN DB INIT ON APP START (IMPORTANT FOR RENDER)
+# =====================================================
+init_db()
+
+
+# =====================================================
+# LOGIN
+# =====================================================
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -54,13 +94,10 @@ def login():
 
         con = get_db()
         cur = con.cursor()
-
-        # ✅ Fetch user by username only
         cur.execute("SELECT * FROM users WHERE username=?", (username,))
         user = cur.fetchone()
         con.close()
 
-        # ✅ Password verification
         if user and check_password_hash(user[2], password):
             session["user_id"] = user[0]
             session["role"] = user[3]
@@ -75,23 +112,34 @@ def login():
     return render_template("login.html")
 
 
-# ---------- ADMIN DASHBOARD ----------
+# =====================================================
+# ADMIN DASHBOARD
+# =====================================================
 @app.route("/admin")
 def admin():
     return render_template("admin_dashboard.html")
 
-# ---------- STUDENT DASHBOARD ----------
+
+# =====================================================
+# STUDENT DASHBOARD
+# =====================================================
 @app.route("/student")
 def student():
     return render_template("student_dashboard.html")
 
-# ---------- LOGOUT ----------
+
+# =====================================================
+# LOGOUT
+# =====================================================
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
 
-# ---------- ADD STUDENT ----------
+
+# =====================================================
+# ADD STUDENT
+# =====================================================
 @app.route("/add_student", methods=["GET", "POST"])
 def add_student():
     if request.method == "POST":
@@ -102,17 +150,20 @@ def add_student():
         con = get_db()
         cur = con.cursor()
         cur.execute(
-            "INSERT INTO students(name, roll_no, department) VALUES (?,?,?)",
+            "INSERT INTO students (name, roll_no, department) VALUES (?, ?, ?)",
             (name, roll, dept)
         )
         con.commit()
         con.close()
 
-        return redirect("/admin")
+        return redirect("/students")
 
     return render_template("add_student.html")
 
-# ---------- VIEW STUDENTS ----------
+
+# =====================================================
+# VIEW STUDENTS
+# =====================================================
 @app.route("/students")
 def students():
     con = get_db()
@@ -123,7 +174,10 @@ def students():
 
     return render_template("students.html", students=data)
 
-# ---------- EDIT STUDENT ----------
+
+# =====================================================
+# EDIT STUDENT
+# =====================================================
 @app.route("/edit_student/<int:id>", methods=["GET", "POST"])
 def edit_student(id):
     con = get_db()
@@ -149,24 +203,27 @@ def edit_student(id):
     return render_template("edit_student.html", student=student)
 
 
-# ---------- DELETE STUDENT ----------
+# =====================================================
+# DELETE STUDENT
+# =====================================================
 @app.route("/delete_student/<int:id>")
 def delete_student(id):
     con = get_db()
     cur = con.cursor()
-
     cur.execute("DELETE FROM students WHERE id=?", (id,))
     con.commit()
     con.close()
 
     return redirect("/students")
 
-# ---------- MARK ATTENDANCE ----------
+
+# =====================================================
+# MARK ATTENDANCE
+# =====================================================
 @app.route("/mark_attendance", methods=["GET", "POST"])
 def mark_attendance():
     con = get_db()
     cur = con.cursor()
-
     cur.execute("SELECT * FROM students")
     students = cur.fetchall()
 
@@ -176,7 +233,7 @@ def mark_attendance():
         for s in students:
             status = request.form.get(str(s[0]))
             cur.execute(
-                "INSERT INTO attendance(student_id, date, status) VALUES (?,?,?)",
+                "INSERT INTO attendance (student_id, date, status) VALUES (?, ?, ?)",
                 (s[0], today, status)
             )
 
@@ -187,7 +244,10 @@ def mark_attendance():
     con.close()
     return render_template("mark_attendance.html", students=students)
 
-# ---------- ATTENDANCE REPORT ----------
+
+# =====================================================
+# ATTENDANCE REPORT
+# =====================================================
 @app.route("/attendance_report")
 def attendance_report():
     con = get_db()
@@ -195,8 +255,8 @@ def attendance_report():
 
     cur.execute("""
         SELECT s.id, s.name, s.roll_no,
-               COUNT(a.id) AS total,
-               SUM(CASE WHEN a.status='Present' THEN 1 ELSE 0 END) AS present
+               COUNT(a.id) AS total_classes,
+               SUM(CASE WHEN a.status='Present' THEN 1 ELSE 0 END) AS present_days
         FROM students s
         LEFT JOIN attendance a ON s.id = a.student_id
         GROUP BY s.id
@@ -207,19 +267,10 @@ def attendance_report():
 
     return render_template("attendance_report.html", report=data)
 
-# ---------- RUN SERVER (ALWAYS LAST) ----------
+
+# =====================================================
+# RUN SERVER (LOCAL ONLY)
+# =====================================================
 if __name__ == "__main__":
-    import os
-
-    # Initialize database once at startup
-    init_db()
-
-    # Render provides PORT automatically
     port = int(os.environ.get("PORT", 10000))
-
-    app.run(host="0.0.0.0", port=port)
-    
-    
-
-
-
+    app.run(host="0.0.0.0", port=port, debug=True)
