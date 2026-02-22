@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Records</title>
+</head>
+<body>
+
+<h2>Attendance Records</h2>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Roll No</th>
+        <th>Status</th>
+    </tr>
+
+    {% for r in records %}
+    <tr>
+        <td>{{ r.date }}</td>
+        <td>{{ r.student.name }}</td>
+        <td>{{ r.student.roll_no }}</td>
+        <td>{{ r.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="{{ url_for('student.students') }}">⬅ Back</a>
+
+</body>
+</html>
