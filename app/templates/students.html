@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Students | Smart Attendance{% endblock %}
+
+{% block content %}
+
+<h2>Student Management</h2>
+
+{% if message %}
+    <div class="alert">{{ message }}</div>
+{% endif %}
+
+<div class="top-actions">
+    <a href="/add-student" class="btn btn-success">➕ Add Student</a>
+    <a href="/attendance-report" class="btn btn-primary">📊 View Attendance</a>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.roll_no }}</td>
+            <td>
+                <a href="/edit-student/{{ student.id }}" class="btn btn-primary">Edit</a>
+                <a href="/delete-student/{{ student.id }}" class="btn btn-danger"
+                   onclick="return confirm('Are you sure you want to delete this student?')">
+                   Delete
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

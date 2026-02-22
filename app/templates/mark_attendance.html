@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Mark Attendance</h2>
+
+<form method="POST">
+    <label>Subject:</label>
+    <select name="subject_id" required>
+    {% for subject in subjects %}
+    <option value="{{ subject.id }}">
+        {{ subject.subject_name }}
+    </option>
+    {% endfor %}
+    </select>
+
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>Status</th>
+        </tr>
+
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.roll_no }}</td>
+            <td>
+                <input type="radio" name="{{ student.id }}" value="Present" required> Present
+                <input type="radio" name="{{ student.id }}" value="Absent"> Absent
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <button class="btn btn-success">Submit Attendance</button>
+</form>
+
+{% endblock %}
