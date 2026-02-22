@@ -1,6 +1,8 @@
 {
     "cSpell.words": [
         "backref",
-        "gunicorn"
+        "gunicorn",
+        "pycache",
+        "venv"
     ]
 }
