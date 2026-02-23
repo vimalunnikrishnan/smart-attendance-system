@@ -6,6 +6,7 @@
         "endfor",
         "gunicorn",
         "itsdangerous",
+        "onclick",
         "psycopg",
         "pycache",
         "venv",
