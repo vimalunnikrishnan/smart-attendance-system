@@ -44,6 +44,9 @@ def create_app():
     app.register_blueprint(dashboard_bp)
 
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            print("Database initialization skipped:", e)
 
     return app

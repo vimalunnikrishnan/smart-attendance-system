@@ -1,8 +1,14 @@
 {
     "cSpell.words": [
         "backref",
+        "colorama",
+        "dotenv",
+        "endfor",
         "gunicorn",
+        "itsdangerous",
+        "psycopg",
         "pycache",
-        "venv"
+        "venv",
+        "Werkzeug"
     ]
 }

@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from flask_login import login_required
-from datetime import date
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required, current_user
+from .models import db, Student, Subject, Period, Attendance
+from datetime import datetime
 
 from app import db
 from app.models import Student, Subject, Attendance
@@ -33,7 +34,7 @@ def mark_attendance():
                 record = Attendance(
                     student_id=student.id,
                     subject_id=subject_id,
-                    date=date.today(),
+                    date=datetime.today(),
                     status=status
                 )
                 db.session.add(record)
@@ -46,6 +47,70 @@ def mark_attendance():
         students=students,
         subjects=subjects
     )
+
+
+# -----------------------------------
+# Create Period (Step 1)
+# -----------------------------------
+@attendance_bp.route("/create_period", methods=["GET", "POST"])
+@login_required
+def create_period():
+
+    subjects = Subject.query.all()
+
+    if request.method == "POST":
+        date = request.form.get("date")
+        period_number = request.form.get("period_number")
+        subject_id = request.form.get("subject_id")
+
+        if not date or not period_number or not subject_id:
+            flash("All fields are required")
+            return redirect(url_for("attendance.create_period"))
+
+        new_period = Period(
+            date=datetime.strptime(date, "%Y-%m-%d"),
+            period_number=int(period_number),
+            subject_id=int(subject_id),
+            teacher_id=current_user.id
+        )
+
+        db.session.add(new_period)
+        db.session.commit()
+
+        flash("Period created successfully")
+        return redirect(url_for("attendance.mark_attendance", period_id=new_period.id))
+
+    return render_template("create_period.html", subjects=subjects)
+
+
+# -----------------------------------
+# Mark Attendance (Step 2)
+# -----------------------------------
+@attendance_bp.route("/mark_attendance/<int:period_id>", methods=["GET", "POST"])
+@login_required
+def mark_attendance(period_id):
+
+    period = Period.query.get_or_404(period_id)
+    students = Student.query.all()
+
+    if request.method == "POST":
+
+        for student in students:
+            status = request.form.get(f"status_{student.id}")
+
+            if status:
+                attendance = Attendance(
+                    student_id=student.id,
+                    period_id=period.id,
+                    status=status
+                )
+                db.session.add(attendance)
+
+        db.session.commit()
+        flash("Attendance marked successfully")
+        return redirect(url_for("dashboard.index"))
+
+    return render_template("mark_attendance.html", students=students, period=period)
 
 
 # =========================
