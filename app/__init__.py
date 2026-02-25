@@ -16,10 +16,16 @@ def create_app():
 
     # ✅ Database Configuration (FIXED)
     if os.environ.get("DATABASE_URL"):
-        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
-    else:
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "database.db")
+        database_url = os.environ.get("DATABASE_URL")
+
+    # Fix old postgres:// issue
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "connect_args": {"sslmode": "require"}
+    }
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -30,7 +36,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     # Register Blueprints
     from app.auth import auth_bp
