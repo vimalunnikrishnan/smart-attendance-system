@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from werkzeug.security import generate_password_hash, check_password_hash
+
 from flask_login import login_user, logout_user, login_required
 
 from app import db
@@ -22,7 +22,7 @@ def register():
 
         hashed = generate_password_hash(password)
 
-        user = User(username=username, password_hash=hashed)
+        user = User(username=username, password=hashed)
         db.session.add(user)
         db.session.commit()
 
@@ -42,11 +42,12 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        from werkzeug.security import generate_password_hash, check_password_hash
-        login_user(user)
-        return redirect(url_for("student.students"))
-
-        flash("Invalid username or password")
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for("student.students"))
+        else:
+            flash("Invalid username or password")
+            return redirect(url_for("auth.login"))
 
     return render_template("login.html")
 
