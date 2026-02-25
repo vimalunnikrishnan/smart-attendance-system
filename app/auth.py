@@ -21,7 +21,7 @@ def register():
 
         hashed = generate_password_hash(password)
 
-        user = User(username=username, password=hashed)
+        user = User(username=username, password=hashed)   # ✅ MUST BE password
         db.session.add(user)
         db.session.commit()
 
