@@ -14,11 +14,16 @@ def create_app():
     # Secret Key
     app.config["SECRET_KEY"] = "smart-attendance-secret"
 
-    # ✅ Database Configuration (FIXED)
-    if os.environ.get("DATABASE_URL"):
-        database_url = os.environ.get("DATABASE_URL")
+    # ==============================
+    # DATABASE CONFIGURATION (SAFE)
+    # ==============================
 
-    # Fix old postgres:// issue
+    database_url = os.environ.get("DATABASE_URL")
+
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable not set!")
+
+    # Fix old postgres:// issue (Render compatibility)
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
 
@@ -26,7 +31,6 @@ def create_app():
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "connect_args": {"sslmode": "require"}
     }
-
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
@@ -38,7 +42,10 @@ def create_app():
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    # Register Blueprints
+    # ==============================
+    # REGISTER BLUEPRINTS
+    # ==============================
+
     from app.auth import auth_bp
     from app.student import student_bp
     from app.attendance import attendance_bp
@@ -49,10 +56,11 @@ def create_app():
     app.register_blueprint(attendance_bp)
     app.register_blueprint(dashboard_bp)
 
+    # ==============================
+    # CREATE TABLES
+    # ==============================
+
     with app.app_context():
-        try:
-            db.create_all()
-        except Exception as e:
-            print("Database initialization skipped:", e)
+        db.create_all()
 
     return app
