@@ -20,7 +20,7 @@ def add_student():
         name = request.form.get("name")
         roll_no = request.form.get("roll_no")
 
-        if Student.query.filter_by(roll_no=roll_no).first():
+        if Student.query.filter_by(roll_number=roll_no).first():
             flash("Roll number already exists")
             return redirect(url_for("student.add_student"))
 
