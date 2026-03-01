@@ -4,11 +4,14 @@
         "colorama",
         "dotenv",
         "endfor",
+        "endwith",
         "gunicorn",
         "itsdangerous",
         "onclick",
         "psycopg",
         "pycache",
+        "rgba",
+        "Segoe",
         "venv",
         "Werkzeug"
     ]
