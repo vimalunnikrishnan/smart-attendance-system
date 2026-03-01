@@ -6,6 +6,7 @@ from app.models import Student
 student_bp = Blueprint("student", __name__)
 
 
+# ---------------- VIEW ALL STUDENTS ----------------
 @student_bp.route("/students")
 @login_required
 def students():
@@ -13,19 +14,27 @@ def students():
     return render_template("students.html", students=students)
 
 
+# ---------------- ADD STUDENT ----------------
 @student_bp.route("/add-student", methods=["GET", "POST"])
 @login_required
 def add_student():
     if request.method == "POST":
         name = request.form.get("name")
-        roll_no = request.form.get("roll_no")
+        roll_number = request.form.get("roll_number")
+        class_name = request.form.get("class_name")
 
-        if Student.query.filter_by(roll_number=roll_no).first():
+        # Check duplicate roll number
+        if Student.query.filter_by(roll_number=roll_number).first():
             flash("Roll number already exists")
             return redirect(url_for("student.add_student"))
 
-        student = Student(name=name, roll_no=roll_no)
-        db.session.add(student)
+        new_student = Student(
+            name=name,
+            roll_number=roll_number,
+            class_name=class_name
+        )
+
+        db.session.add(new_student)
         db.session.commit()
 
         return redirect(url_for("student.students"))
@@ -33,6 +42,7 @@ def add_student():
     return render_template("add_student.html")
 
 
+# ---------------- EDIT STUDENT ----------------
 @student_bp.route("/edit-student/<int:id>", methods=["GET", "POST"])
 @login_required
 def edit_student(id):
@@ -40,17 +50,22 @@ def edit_student(id):
 
     if request.method == "POST":
         student.name = request.form.get("name")
-        student.roll_no = request.form.get("roll_no")
+        student.roll_number = request.form.get("roll_number")
+        student.class_name = request.form.get("class_name")
+
         db.session.commit()
         return redirect(url_for("student.students"))
 
     return render_template("edit_student.html", student=student)
 
 
+# ---------------- DELETE STUDENT ----------------
 @student_bp.route("/delete-student/<int:id>")
 @login_required
 def delete_student(id):
     student = Student.query.get_or_404(id)
+
     db.session.delete(student)
     db.session.commit()
+
     return redirect(url_for("student.students"))
