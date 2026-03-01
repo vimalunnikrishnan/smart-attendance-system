@@ -41,7 +41,7 @@ def create_app():
     # Register Blueprints
     from app.auth import auth_bp
     from app.student import student_bp
-    from app.attendance_backup import attendance_bp
+    from app.attendance import attendance_bp
     from app.dashboard import dashboard_bp
 
     app.register_blueprint(auth_bp)
