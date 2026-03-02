@@ -1,70 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Mark Attendance</title>
-    <style>
-        body { font-family: Arial; padding: 40px; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: green;
-            color: white;
-            border: none;
-        }
-    </style>
-</head>
-<body>
+<div style="padding:40px;">
 
     <h2>
         Mark Attendance  
-        (Period {{ period.period_number }} | {{ period.subject.subject_name }} | {{ period.date }})
+        (Period {{ period.period_number }} |
+        {{ period.subject.subject_name }} |
+        {{ period.date }})
     </h2>
 
     <form method="POST">
 
-        <table>
+        <table style="width:100%; border-collapse:collapse;">
             <tr>
-                <th>Roll No</th>
-                <th>Name</th>
-                <th>Present</th>
-                <th>Absent</th>
+                <th style="border:1px solid #ddd; padding:10px;">Roll No</th>
+                <th style="border:1px solid #ddd; padding:10px;">Name</th>
+                <th style="border:1px solid #ddd; padding:10px;">Present</th>
+                <th style="border:1px solid #ddd; padding:10px;">Absent</th>
             </tr>
 
             {% for student in students %}
             <tr>
-                <td>{{ student.roll_number }}</td>
-                <td>{{ student.name }}</td>
-                <td>
-                    <input type="radio" name="status_{{ student.id }}" value="Present" required>
+                <td style="border:1px solid #ddd; padding:10px;">
+                    {{ student.roll_number }}
                 </td>
-                <td>
-                    <input type="radio" name="status_{{ student.id }}" value="Absent" required>
+                <td style="border:1px solid #ddd; padding:10px;">
+                    {{ student.name }}
+                </td>
+                <td style="border:1px solid #ddd; padding:10px;">
+                    <input type="radio"
+                           name="status_{{ student.id }}"
+                           value="Present" required>
+                </td>
+                <td style="border:1px solid #ddd; padding:10px;">
+                    <input type="radio"
+                           name="status_{{ student.id }}"
+                           value="Absent" required>
                 </td>
             </tr>
             {% endfor %}
-
         </table>
 
-        <button type="submit">Save Attendance</button>
+        <button type="submit"
+                style="margin-top:20px; padding:10px 20px; background:green; color:white; border:none;">
+            Save Attendance
+        </button>
 
     </form>
 
-</body>
-</html>
+</div>
+
 {% endblock %}
