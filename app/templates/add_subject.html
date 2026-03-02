@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="max-width:500px; margin:40px auto;">
+    <h2>Add Subject</h2>
+
+    <form method="POST">
+        <div style="margin-bottom:15px;">
+            <label>Subject Name</label><br>
+            <input type="text" name="subject_name" 
+                   placeholder="Enter Subject Name" 
+                   style="width:100%; padding:8px;" required>
+        </div>
+
+        <button type="submit" 
+                style="padding:10px 20px; background:#667eea; color:white; border:none;">
+            Add Subject
+        </button>
+    </form>
+</div>
+
+{% endblock %}

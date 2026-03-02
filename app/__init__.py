@@ -48,11 +48,13 @@ def create_app():
 
     from app.auth import auth_bp
     from app.student import student_bp
+    from app.subject import subject_bp
     from app.attendance import attendance_bp
     from app.dashboard import dashboard_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(student_bp)
+    app.register_blueprint(subject_bp)
     app.register_blueprint(attendance_bp)
     app.register_blueprint(dashboard_bp)
 

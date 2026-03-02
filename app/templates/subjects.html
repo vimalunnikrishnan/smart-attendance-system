@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="max-width:600px; margin:40px auto;">
+    <h2>All Subjects</h2>
+
+    <a href="{{ url_for('subject.add_subject') }}">+ Add New Subject</a>
+
+    <ul style="margin-top:20px;">
+        {% for subject in subjects %}
+            <li>{{ subject.subject_name }}</li>
+        {% else %}
+            <li>No subjects added yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
