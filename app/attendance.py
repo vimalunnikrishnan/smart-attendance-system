@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from datetime import datetime, date
 from app import db
+from sqlalchemy import func
 from app.models import Student, Subject, User, Period, Attendance
 
 attendance_bp = Blueprint("attendance", __name__)
@@ -109,20 +110,51 @@ def mark_attendance(period_id):
 @login_required
 def attendance_report():
 
+    # ===== Detailed Records =====
     records = db.session.query(
-        Student.name,
-        Student.roll_number,
-        Subject.subject_name,
-        Period.date,
-        Period.period_number,
-        Attendance.status
+        Student.name.label("name"),
+        Student.roll_number.label("roll_no"),
+        Subject.subject_name.label("subject_name"),
+        Period.date.label("date"),
+        Attendance.status.label("status")
     ).join(Attendance, Student.id == Attendance.student_id) \
      .join(Period, Attendance.period_id == Period.id) \
      .join(Subject, Period.subject_id == Subject.id) \
      .order_by(Period.date.desc()) \
      .all()
 
+
+    # ===== Percentage Calculation =====
+    stats = db.session.query(
+        Student.name.label("name"),
+        Student.roll_number.label("roll"),
+        func.count(Attendance.id).label("total"),
+        func.sum(
+            db.case(
+                (Attendance.status == "Present", 1),
+                else_=0
+            )
+        ).label("present")
+    ).join(Attendance, Student.id == Attendance.student_id) \
+     .group_by(Student.id) \
+     .all()
+
+    report = []
+
+    for s in stats:
+        percentage = 0
+        if s.total > 0:
+            percentage = round((s.present / s.total) * 100, 2)
+
+        report.append({
+            "name": s.name,
+            "roll": s.roll,
+            "percentage": percentage
+        })
+
     return render_template(
         "attendance_report.html",
-        records=records
+        records=records,
+        report=report
     )
+    
