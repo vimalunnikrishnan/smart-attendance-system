@@ -21,6 +21,6 @@ def add_subject():
         db.session.add(new_subject)
         db.session.commit()
 
-        return redirect(url_for("subject.subjects"))
+        return redirect(url_for("subject.view_subjects"))
 
     return render_template("add_subject.html")
