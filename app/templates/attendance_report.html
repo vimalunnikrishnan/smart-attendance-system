@@ -81,10 +81,11 @@
 
 
     <!-- =========================
-         Student Percentage Table
+        Student Percentage Table
     ========================== -->
     <h3>📊 Student Attendance Percentage</h3>
-    
+
+    {% if report %}
     <table>
         <tr>
             <th>Name</th>
@@ -100,12 +101,8 @@
         </tr>
         {% endfor %}
     </table>
-
-
-    <div class="back">
-        <a href="/students">⬅ Back to Students</a>
-    </div>
-
-</div>
-
-{% endblock %}
+    {% else %}
+    <p style="text-align:center; margin-top:15px;">
+        No attendance percentage data available.
+    </p>
+    {% endif %}

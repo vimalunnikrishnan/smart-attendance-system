@@ -159,6 +159,9 @@ def attendance_report():
             "percentage": percentage
         })
 
+    print("STATS:", stats)
+    print("REPORT:", report)
+    
     return render_template(
         "attendance_report.html",
         records=records,
