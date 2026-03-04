@@ -142,16 +142,18 @@ def attendance_report():
     report = []
 
     for s in stats:
+        total = s.total or 0
+        present = s.present or 0   # <-- important fix
+
         percentage = 0
-        if s.total > 0:
-            percentage = round((s.present / s.total) * 100, 2)
+        if total > 0:
+            percentage = round((present / total) * 100, 2)
 
         report.append({
             "name": s.name,
             "roll": s.roll,
             "percentage": percentage
         })
-
     return render_template(
         "attendance_report.html",
         records=records,
