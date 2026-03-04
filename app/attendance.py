@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from datetime import datetime, date
+from datetime import datetime
 from app import db
-from sqlalchemy import func
+from sqlalchemy import func, case
 from app.models import Student, Subject, User, Period, Attendance
 
 attendance_bp = Blueprint("attendance", __name__)
@@ -124,16 +124,18 @@ def attendance_report():
      .all()
 
 
-    # ===== Percentage Calculation =====
+    # ===== Percentage Calculation (FIXED VERSION) =====
     stats = db.session.query(
         Student.name.label("name"),
         Student.roll_number.label("roll"),
         func.count(Attendance.id).label("total"),
-        func.sum(
-            db.case(
-                (Attendance.status == "Present", 1),
-                else_=0
-            )
+        func.coalesce(
+            func.sum(
+                case(
+                    (Attendance.status == "Present", 1),
+                    else_=0
+                )
+            ), 0
         ).label("present")
     ).outerjoin(
         Attendance, Student.id == Attendance.student_id
@@ -145,7 +147,7 @@ def attendance_report():
 
     for s in stats:
         total = s.total or 0
-        present = s.present or 0   # <-- important fix
+        present = s.present or 0
 
         percentage = 0
         if total > 0:
@@ -156,9 +158,9 @@ def attendance_report():
             "roll": s.roll,
             "percentage": percentage
         })
+
     return render_template(
         "attendance_report.html",
         records=records,
         report=report
     )
-    
