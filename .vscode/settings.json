@@ -8,6 +8,7 @@
         "gunicorn",
         "itsdangerous",
         "onclick",
+        "outerjoin",
         "psycopg",
         "pycache",
         "rgba",

@@ -135,9 +135,11 @@ def attendance_report():
                 else_=0
             )
         ).label("present")
-    ).join(Attendance, Student.id == Attendance.student_id) \
-     .group_by(Student.id) \
-     .all()
+    ).outerjoin(
+        Attendance, Student.id == Attendance.student_id
+    ).group_by(
+        Student.id
+    ).all()
 
     report = []
 
